@@ -1,7 +1,7 @@
 # FeenICS
 A pipeline for FrEquENcy-based Ica Cleaning of Spirals. Aims to remove spiral-specific aritfact from fMRI scans.
 
-This tool was built to work with FSL's [Melodic](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/MELODIC).
+This tool was built to work with FSL's [MELODIC](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/MELODIC).
 It was created to automate the process of evaluating and removing ICA components containing spiral artifact, which is accomplished by evaulating the per slice frequency loading, and scoring components based on patterns
 of low or high frequency information. The fsl_regfilt command-line program can then be used to regress out components selected for removal.
 

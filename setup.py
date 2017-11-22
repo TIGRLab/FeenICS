@@ -16,7 +16,7 @@ setup(
     long_description=long_description,
     description='For cleaning spiral scans containing spiral specific artifact',
     url='https://github.com/eziraldo/FeenICS',
-    scripts=["s1_1_folder_setup.py","s2_1_identify_components.py", "s3_1_remove_flagged_components.py", "check_slices.py"],
+    scripts=["bin/s1_folder_setup.py","bin/s2_identify_components.py", "bin/s3_remove_flagged_components.py", "bin/check_slices.py"],
     setup_requires=['numpy','nibabel','matplotlib','scipy','scikit-image>=0.13'],
     classifiers=[
        'Environment :: Console',
