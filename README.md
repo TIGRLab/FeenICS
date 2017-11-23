@@ -126,7 +126,7 @@ s2_identify_components.py /path/to/directory
 
 #### Step 3(optional) - Run ICArus (see https://github.com/edickie/ICArus for install information):
 ~~~sh
-MELODIC_OUTPUTS=`cd /path/to/directory; ls -1d *.ica`
+MELODIC_OUTPUTS=`cd /path/to/directory; ls -1d */sprl*`
 icarus-report ${MELODIC_OUTPUTS}
 ~~~
 
