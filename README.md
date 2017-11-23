@@ -41,7 +41,7 @@ Arguments:
 
 <directory>      path to run location (i.e. main folder where the required file stucture should be)
 <subject_list>   path to folder containing subject names (as subfolders)
-<sprl> 		  path to study folder containing split spirals
+<sprl> 		 path to study folder containing split spirals
                     NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED "sprlIN.nii" & "sprlOUT.nii"
 
 Options:
@@ -79,7 +79,7 @@ Arguments:
 <directory>    path to run location
                     (i.e. location where subject folders and MELODIC output are contained; same as s1 and s2)
 
-<cleaned> 	 path to desired location of cleaned, separated scans
+<cleaned> path to desired location of cleaned, separated scans
 
 Options:
     --output PATH       if csv outputs were generated in non-default location, identify path to this location
