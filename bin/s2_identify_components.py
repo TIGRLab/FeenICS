@@ -14,7 +14,7 @@ Arguments:
 
 import argparse
 import os, sys
-import check_slices_byNum
+import check_slices
 
 parser = argparse.ArgumentParser(description="Remove sprl noise components from all subjects in run folder")
 
@@ -35,7 +35,7 @@ def main(directory):
 
             try:
                 print("Identifying components to be removed for {}, {}".format(i, sprl))
-                check_slices_byNum.main(melodicfile, outputcsv)
+                check_slices.main(melodicfile, outputcsv)
             except Exception:
                 print("Could not find melodic_IC file for {}, {} or Permissions Error".format(i, sprl))
                 continue

@@ -1,4 +1,4 @@
-# FeenICS
+# FeenICS (fē'nĭks)
 A pipeline for FrEquENcy-based Ica Cleaning of Spirals. Aims to remove spiral-specific aritfact from fMRI scans.
 
 This tool was built to work with FSL's [MELODIC](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/MELODIC).
