@@ -79,7 +79,7 @@ Arguments:
 <directory>    path to run location
                     (i.e. location where subject folders and MELODIC output are contained; same as s1 and s2)
 
-<cleaned> path to desired location of cleaned, separated scans
+<cleaned>      path to desired location of cleaned, separated scans
 
 Options:
     --output PATH       if csv outputs were generated in non-default location, identify path to this location
