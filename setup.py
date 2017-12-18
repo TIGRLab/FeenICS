@@ -66,6 +66,6 @@ setup(
             'numpy',
             'pandas',
             'scipy',
-            'scikit-image'],
+            'scikit-image>=0.13.1'],
     include_package_data=True,
 )
