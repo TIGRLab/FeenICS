@@ -59,14 +59,18 @@ Be aware that the script will create as many calls to MELODIC as there are sprl 
 
 ```
 Usage:
-  s2_identify_components.py <directory>
+    s2_1_RemoveNoise.py -m <midFactor> -l <lowFactor> <directory>
 
 Arguments:
+    <directory>     path to run location
+                        (i.e. main folder where the required file stucture should be)
 
-<directory>    path to run location (i.e. main folder where the required file stucture should be; same as s1_setup.py)
+Options:
+    <midFactor>     Cutoff multiplier for mid range frequency information. Raise this value to more aggressively remove noise components. Default is 3.
+    <lowFactor>     Cutoff multiplier for low range frequency information. Raise this value to keep more signal components. Default is 1.
 
 DETAILS
-Feeds paths and output file names to check_slices.py for each subject within the specified directory. The default name for the output classification file is fix4melview_Standard_thr20.txt.
+Feeds paths, multipliers, and output file names to check_slices.py for each subject within the specified directory. The default name for the output classification file is fix4melview_Standard_thr20.txt.
 ```
 
 ### s3_identify_components.py
@@ -101,6 +105,8 @@ Usage:
 Arguments:
 <melodic_file>   path to any melodic_IC.nii.gz file
 <outputname>     path to desired output classification file location
+<factorA>        multiplier to be used to determine mid/high frequency cutoffs. If called from s2, default is 3.
+<factorB>        multiplier to be used to determine low frequency cutoffs. If called from s2, default is 1.
 
 DETAILS
 This script is called by s2_identify_components.py. Can be used independently to troubleshoot classification or path identification issues, or just to run one spiral scan at a time.

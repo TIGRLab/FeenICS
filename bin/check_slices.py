@@ -37,7 +37,7 @@ def cutoff(listB, multiplier):
     outliers = quart_three + diff*multiplier
     return(outliers)
 
-def main(input_comps, output_csv, plot=False):
+def main(input_comps, output_csv, factorA, factorB, plot=False):
 
     # input_comps = '/scratch/eziraldo/STOPPD_cleaning/2017_STOPPD_SpiralINOUT/20151110_Ex04578_STOP1MR_STKR063_SpiralSeparated/sprlIN/Prestats.feat/filtered_func_data.ica/melodic_IC.nii.gz'
     # load sprl nifti
@@ -91,7 +91,8 @@ def main(input_comps, output_csv, plot=False):
 
             # if plot option is specified, a colour map of each slice fft will be displayed
             if plot==True:
-                plt.imshow(pxx, vmin = 0, vmax = 200000)
+                pxxPlot = abs(fftshift(fft2(data[:,:,zslice, comp]))**2)
+                plt.imshow(pxxPlot, vmin = 0, vmax = 50000)
                 plt.colorbar()
                 plt.title('comp={} slice {}'.format(comp+1, zslice+1))
                 plt.show()
@@ -115,13 +116,13 @@ def main(input_comps, output_csv, plot=False):
     # calculate the cutoff for each slice (both mid frequency and low frequency)
     for slices in mid_byslice:
 
-        cutoff_mid = cutoff(slices, 3)
+        cutoff_mid = cutoff(slices, factorA)
         cutoff_mid_list.append(cutoff_mid)
         #     print(cutoff_mid)
         # print('\n')
 
     for slices in lo_byslice:
-        cutoff_lo = cutoff(slices, 1)
+        cutoff_lo = cutoff(slices, factorB)
         cutoff_lo_list.append(cutoff_lo)
 
     # print(cutoff_mid_list)
@@ -183,7 +184,7 @@ def main(input_comps, output_csv, plot=False):
                 # print("{},{},{},{},{},signal".format(comp+1, zslice+1, mid_comp_quart[comp][zslice], lo_comp_quart[comp][zslice], ratio_comp_quart[comp][zslice]))
                 points = points - 1
 
-                # print("{} {} {} {}".format(comp+1, zslice+1, lo_comp_quart[comp][zslice], lo_comp[comp][zslice]))
+            # print("{},{},{},{},{}".format(comp+1, zslice+1, mid_comp_quart[comp][zslice], lo_comp_quart[comp][zslice], ratio_comp_quart[comp][zslice]))
 
         # If the total component points are greater than 0, then remove the component
         if points > 0:
@@ -223,7 +224,9 @@ if __name__ == '__main__':
 
     input_comps = sys.argv[1]
     output = sys.argv[2]
-    if len(sys.argv) == 4:
-        if sys.argv[3] == 'plot':
+    factorA = float(sys.argv[3])
+    factorB = float(sys.argv[4])
+    if len(sys.argv) == 6:
+        if sys.argv[5] == 'plot':
             main(input_comps, output, plot=True)
-    main(input_comps, output)
+    main(input_comps, output, factorA, factorB)

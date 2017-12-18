@@ -65,16 +65,18 @@ def main(directory, sub_list, sprl, scc = False):
 
     # iterate through subjects
     for i in list:
+        sprlIN_tf = False
+        sprlOUT_tf = False
 
         # locate the original spirals
         sprlIN_tf = os.path.exists(os.path.join(directory, i, "sprlIN", "sprlIN.nii"))
         sprlOUT_tf = os.path.exists(os.path.join(directory, i, "sprlOUT", "sprlOUT.nii"))
 
-        if sprlIN_tf == False:
-            sprlIN_location = find('sprlIN.nii', os.path.join(sprl, i))
+        # if sprlIN_tf == False:
+        sprlIN_location = find('sprlIN.nii', os.path.join(sprl, i))
 
-        if sprlOUT_tf == False:
-            sprlOUT_location = find('sprlOUT.nii', os.path.join(sprl, i))
+        # if sprlOUT_tf == False:
+        sprlOUT_location = find('sprlOUT.nii', os.path.join(sprl, i))
 
         # Read TR from nifti header
         # if load_worked == False:
@@ -96,7 +98,6 @@ def main(directory, sub_list, sprl, scc = False):
                     os.makedirs(os.path.join(directory , i, subfolder))
                 except OSError as e:
                     if e.errno != errno.EEXIST:
-                        raise
                         continue
 
             # move sprl files into appropriate subfolders

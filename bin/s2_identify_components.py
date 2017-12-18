@@ -4,11 +4,15 @@
 Requires output of FSL Melodic. Calls check_slices.py to identify components containing spiral artifact.
 
 Usage:
-    s2_1_RemoveNoise.py <directory>
+    s2_1_RemoveNoise.py -m <midFactor> -l <lowFactor> <directory>
 
 Arguments:
-    <directory>      path to run location
+    <directory>     path to run location
                         (i.e. main folder where the required file stucture should be)
+
+Options:
+    <midFactor>     Cutoff multiplier for mid range frequency information. Raise this value to more aggressively remove noise components. Default is 3.
+    <lowFactor>     Cutoff multiplier for low range frequency information. Raise this value to keep more signal components. Default is 1.
 
 """
 
@@ -18,14 +22,19 @@ import check_slices
 
 parser = argparse.ArgumentParser(description="Remove sprl noise components from all subjects in run folder")
 
+parser.add_argument("-m", "--midFactor", help="cutoff factor for mid/high frequency -noise. Increase to remove more 'noise' components. Default is 3.")
+parser.add_argument("-l", "--lowFactor", help="cutoff factor for low frequency -signal. Increase to remove more 'signal' components. Default is 1.")
 parser.add_argument("directory", type=str, help="location of the run directory (contains subject folders)")
 args = parser.parse_args()
 
-def main(directory):
+def main(midFactor, lowFactor, directory):
 
     list_subs = os.listdir(directory)
     subfolders = ["sprlIN", "sprlOUT"]
     csvfilename = 'fix4melview_Standard_thr20.txt'
+
+    midFactor = float(midFactor)
+    lowFactor = float(lowFactor)
 
     # for each subject and each sprl condition (IN or OUT), call check_slices to create .txt file listing comps to be removed
     for i in list_subs:
@@ -35,13 +44,23 @@ def main(directory):
 
             try:
                 print("Identifying components to be removed for {}, {}".format(i, sprl))
-                check_slices.main(melodicfile, outputcsv)
+                check_slices.main(melodicfile, outputcsv, midFactor, lowFactor)
             except Exception:
                 print("Could not find melodic_IC file for {}, {} or Permissions Error".format(i, sprl))
                 continue
 
 if __name__ == '__main__':
 
+    if args.midFactor:
+        midFactor = args.midFactor
+    else:
+        midFactor = 3
+
+    if args.lowFactor:
+        lowFactor = args.lowFactor
+    else:
+        lowFactor = 1
+
     directory = args.directory
 
-    main(directory)
+    main(midFactor, lowFactor, directory)
