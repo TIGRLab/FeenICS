@@ -3,31 +3,29 @@
 """
 Sets up file structure required to run FSL Melodic. Requires split spiral scans (sprlIN.nii and sprlOUT.nii).
 Usage:
-    s1_1_setup.py -p cluster_name <run_location> <subject_list> <sprl*.nii>
+    s1_folder_setup.py <directory>
 
 Arguments:
 
-    <sprl*.nii>         path to study folder containing split spirals
-                            NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED "sprlIN.nii" & "sprlOUT.nii"
-
-    <run_location>      path to run location (i.e. main folder where the required file stucture should be)
-    <subject_list>      path to folder containing subject names (as subfolders)
+    <directory>             path to top experiment directory. Outputs will be created here
 
 Options:
 
-    -p                  to print instuctions for running in parallel (GNU parallel) invoke this option
+    -i                      alternative experiment folder containing subjectID subfolders
+    -s                      alternative folder containing split spirals
+    -p                      to print instuctions for running in parallel (GNU parallel) invoke this option
+
 
 """
 import argparse
 import os, sys, errno, shutil, fnmatch
 import subprocess
-import nibabel as nib
 
 parser = argparse.ArgumentParser(description="Set up the required file structure and runs FSL Melodic")
 parser.add_argument("-p", "--parallel", help="flag if you would like to run FSL steps on compute cluster in parallel (i.e. scc)")
-parser.add_argument("directory", type=str, help="location of the run directory (contains MELODIC output folders)")
-parser.add_argument("sub_list", type=str, help="file path containing subject names as subfolders")
-parser.add_argument("sprl", type=str, help="path to study folder containing split spirals - NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED 'sprlIN.nii' & 'sprlOUT.nii'")
+parser.add_argument("-s", "--subs", help="alternative experiment folder containing subjectID subfolders. Use this option if directory does not already contain subjectID subfolders")
+parser.add_argument("-i", "--sprl", help="alternative folder containing split spirals - NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED 'sprlIN.nii' & 'sprlOUT.nii'")
+parser.add_argument("directory", type=str, help="path to top experiment directory. Outputs will be created here.")
 
 args = parser.parse_args()
 
@@ -46,7 +44,7 @@ def copy(source, dest):
         print("File already exists")
         return
 
-def main(directory, sub_list, sprl, scc = False):
+def main(directory, subs, sprl, scc = False):
 
     #  Create file structure required to run FSL Melodic. SubjectID -> sprl* -> T1_brain, sprl*.nii
     try:
@@ -56,7 +54,7 @@ def main(directory, sub_list, sprl, scc = False):
             raise
 
     # list all the subjects in the subject directory
-    list = os.listdir(sub_list)
+    list = os.listdir(subs)
     # define subfolders
     subfolders = ['sprlIN', 'sprlOUT']
 
@@ -77,19 +75,6 @@ def main(directory, sub_list, sprl, scc = False):
 
         # if sprlOUT_tf == False:
         sprlOUT_location = find('sprlOUT.nii', os.path.join(sprl, i))
-
-        # Read TR from nifti header
-        # if load_worked == False:
-        #     try:
-        #         imgIN = nib.load(sprlIN_location[0])
-        #         hdrIN = imgIN.header
-        #         TR = "--tr=" + str((hdrIN['pixdim'][4]))
-        #         vol = str(hdrIN['dim'][4])
-        #     except:
-        #         print("Could not load image, {}".format(i))
-        #         continue
-        #     else:
-        #         load_worked = True
 
         # make sprlIN and sprlOUT folders
         for subfolder in subfolders:
@@ -120,10 +105,15 @@ def main(directory, sub_list, sprl, scc = False):
                 if mc_tf == False:
                     print("Motion correcting {}, {}".format(i, subfolder))
                     motion_corr_cmd = ["mcflirt", "-in", subfolder, "-refvol","2", "-out", "motion_corr", "-plots"]
-                    p = subprocess.Popen(motion_corr_cmd, stdout=subprocess.PIPE)
-                    p.wait()
-                    if p.returncode != 0:
-                        print("motion correction failed")
+                    try:
+                        p = subprocess.Popen(motion_corr_cmd, stdout=subprocess.PIPE)
+                        p.wait()
+                        if p.returncode != 0:
+                            print("motion correction failed")
+                    except:
+                        print("FSL not on path")
+                        sys.exit(1)
+
 
                 # check if brain extracted file exists, if not call bet
                 bet_tf = os.path.exists("mask_mask.nii.gz")
@@ -151,6 +141,8 @@ def main(directory, sub_list, sprl, scc = False):
                     print("Running ICA (melodic) {}, {}. Check filtered_func_data.ica/log.txt for process details".format(i, subfolder))
                     melodic_cmd = ["melodic", "-i", "filtered_func_data", "-o", "filtered_func_data.ica", "-v", "--nobet", "--bgthreshold=0", "-d", "0", "--report", "--guireport=../../report.html"]
                     p = subprocess.Popen(melodic_cmd, stdout=open(os.devnull, 'wb'))
+                else:
+                    print("Melodic already run. Remove folder to rerun")
 
     # to print commands for running FSL in parallel on scc or other computing cluster to terminal
     if scc == True:
@@ -159,7 +151,7 @@ def main(directory, sub_list, sprl, scc = False):
 
         rundir ="/KIMEL/tigrlab" + directory
 
-        setup_cmds ="cd ${rundir}\nsubs=`cd ${rundir}; ls -1d */sprl*`\nsprls=`cd /KIMEL/tigrlab/scratch/eziraldo/Data_take2/COGDBY/2015_0707_PR031_SpiralSeparated; ls`\n"
+        setup_cmds ="cd ${rundir}\nsubs=`cd ${rundir}; ls -1d */sprl*`\nsprls=`cd /KIMEL/tigrlab/scratch/eziraldo/Data_take2/COGDBY; ls`\n"
 
         mcflirtBET_cmd= "echo mcflirt -in ${rundir}/{}/{/}.nii -refvol 2 -out {}/motion_corr -plots; echo bet {}/motion_corr {}/mask -f 0.4 -m -n; fslmaths ${rundir}/{}/motion_corr -mas ${rundir}/{}/mask_mask ${rundir}/{}/filtered_func_data"
         melodic_cmd = "echo melodic -i ${rundir}/{}/filtered_func_data -o {}/filtered_func_data.ica -v --nobet --bgthreshold=0 -d 0 --report --guireport=../../report.html"
@@ -177,12 +169,20 @@ def main(directory, sub_list, sprl, scc = False):
 if __name__ == '__main__':
 
     directory = args.directory
-    sub_list = args.sub_list
-    sprl = args.sprl
+
+    if args.sprl:
+        sprl = args.sprl
+    else:
+        sprl = args.directory
+
+    if args.subs:
+        subs = args.subs
+    else:
+        subs = args.directory
 
     if args.parallel:
         scc = True
     else:
         scc = False
 
-    main(directory, sub_list, sprl, scc)
+    main(directory, subs, sprl, scc)

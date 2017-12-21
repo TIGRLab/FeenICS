@@ -4,15 +4,14 @@
 Requires output of FSL Melodic. Calls check_slices.py to identify components containing spiral artifact.
 
 Usage:
-    s2_1_RemoveNoise.py -m <midFactor> -l <lowFactor> <directory>
+    s2_identify_components.py -m <midFactor> -l <lowFactor> <directory>
 
 Arguments:
-    <directory>     path to run location
-                        (i.e. main folder where the required file stucture should be)
+    <directory>         path to top experiment directory
 
 Options:
-    <midFactor>     Cutoff multiplier for mid range frequency information. Raise this value to more aggressively remove noise components. Default is 3.
-    <lowFactor>     Cutoff multiplier for low range frequency information. Raise this value to keep more signal components. Default is 1.
+    -m, --midFactor     Cutoff multiplier for mid range frequency information. Raise this value to more aggressively remove noise components. Default is 3.
+    -l, --lowFactor     Cutoff multiplier for low range frequency information. Raise this value to keep more signal components. Default is 1.
 
 """
 
@@ -24,7 +23,7 @@ parser = argparse.ArgumentParser(description="Remove sprl noise components from 
 
 parser.add_argument("-m", "--midFactor", help="cutoff factor for mid/high frequency -noise. Increase to remove more 'noise' components. Default is 3.")
 parser.add_argument("-l", "--lowFactor", help="cutoff factor for low frequency -signal. Increase to remove more 'signal' components. Default is 1.")
-parser.add_argument("directory", type=str, help="location of the run directory (contains subject folders)")
+parser.add_argument("directory", type=str, help="path to top experiment directory")
 args = parser.parse_args()
 
 def main(midFactor, lowFactor, directory):
