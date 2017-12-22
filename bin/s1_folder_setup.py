@@ -22,7 +22,7 @@ import os, sys, errno, shutil, fnmatch
 import subprocess
 
 parser = argparse.ArgumentParser(description="Set up the required file structure and runs FSL Melodic")
-parser.add_argument("-p", "--parallel", help="flag if you would like to run FSL steps on compute cluster in parallel (i.e. scc)")
+parser.add_argument("-p", "--parallel", action='store_true', help="flag if you would like to run FSL steps on compute cluster in parallel (i.e. scc)")
 parser.add_argument("-s", "--subs", help="alternative experiment folder containing subjectID subfolders. Use this option if directory does not already contain subjectID subfolders")
 parser.add_argument("-i", "--sprl", help="alternative folder containing split spirals - NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED 'sprlIN.nii' & 'sprlOUT.nii'")
 parser.add_argument("directory", type=str, help="path to top experiment directory. Outputs will be created here.")

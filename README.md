@@ -6,10 +6,15 @@ It was created to automate the process of evaluating and removing ICA components
 of low or high frequency information. The fsl_regfilt command-line program can then be used to regress out components selected for removal.
 
 ## Installation
-```sh
-git clone https://github.com/eziraldo/FeenICS.git
-cd FeenICS
-sudo python ./setup.py install
+```
+1. Download Dockerfile
+2. sudo apt-get install docker.io (if you don't have docker already installed)
+3. cd /path/to/Dockerfile
+4. sudo docker build -t feenics .
+5. sudo docker run -v /path/to/data:/input -i -t feenics
+    NOTE: where /path/to/data is a folder that you want access to from inside
+    the container; 'input' will be the name of this folder inside the container.
+
 ```
 
 ## Dependancies
@@ -22,7 +27,7 @@ Python dependancies (these will be installed when you install FeenICS if you don
  + numpy
  + matplotlib
  + scipy
- + scikit-image (0.13.1)
+ + scikit-image (>=0.13.1)
 
 ## There are four executables:
 + [**s1_folder_setup.py**](#s1_1_folder_setup.py) : To create the folder structure necessary to run Melodic and the remainder of the scripts.
@@ -35,85 +40,104 @@ Python dependancies (these will be installed when you install FeenICS if you don
 
 ```
 Usage:
-  s1_setup.py <directory> <subject_list> <sprl>
+  s1_setup.py -p -i PATH -s PATH <directory>
 
 Arguments:
 
-<directory>      path to run location (i.e. main folder where the required file stucture should be)
-<subject_list>   path to folder containing subject names (as subfolders)
-<sprl> 		 path to study folder containing split spirals
-                    NOTE: MUST BE CONTAINED WITHIN SUBJECT FOLDER & BE NAMED "sprlIN.nii" & "sprlOUT.nii"
-
+  <directory>         Path to top experiment directory. Outputs will be created
+                      here.
 Options:
 
- --parallel, -p CLUSTER	   to print instuctions for running in parallel (GNU parallel), or to prevent from running FSL MCFLIRT, BET, and MELODIC steps
+  --sprl, -i PATH     Specify alternative folder containing split spirals.
+
+  --subs, -s PATH     Specify alternative experiment folder containing
+                      subjectID subfolders.
+
+  --parallel, -p      Print instuctions for running in parallel (GNU parallel)
+                      instead of running FSL steps on machine in series.
 
 DETAILS
-Makes subject and sprl subfolders within <directory>. Moves separated spiral files from <sprl> to appropriate <directory> subfolders. Subject folders are named after those contained in <subject_list>.
-It is likely that two or more of these arguments will be the same path. If -p is not specified, run will motion correct using MCFLIRT, brain extract, register, and then run MELODIC.
-Be aware that the script will create as many calls to MELODIC as there are sprl files.
-
+Makes subject and sprl subfolders within <directory>. Moves separated spiral
+files to appropriate subfolders. If split spirals are not already contained
+within <directory>, use the "-i" option to specify an alternative path. Specify
+"-p" if you would not like to run FSL preprocessing steps at this time. It will
+print instructions to run MCFLIRT, BET, and MELODIC using GNU parallel.
 ```
 
 ### s2_identify_components.py
 
 ```
 Usage:
-    s2_1_RemoveNoise.py -m <midFactor> -l <lowFactor> <directory>
+  s2_1_RemoveNoise.py -m FLOAT -l FLOAT <directory>
 
 Arguments:
-    <directory>     path to run location
-                        (i.e. main folder where the required file stucture should be)
+  <directory>         Path to top experiment directory.
 
 Options:
-    <midFactor>     Cutoff multiplier for mid range frequency information. Raise this value to more aggressively remove noise components. Default is 3.
-    <lowFactor>     Cutoff multiplier for low range frequency information. Raise this value to keep more signal components. Default is 1.
+  --midFactor, -m     Cutoff multiplier for mid range frequency information.
+                      Raise this value to more aggressively remove noise
+                      components. Default is 3.
+
+  --lowFactor, -l     Cutoff multiplier for low range frequency information.
+                      Raise this value to keep more signal components.
+                      Default is 1.
 
 DETAILS
-Feeds paths, multipliers, and output file names to check_slices.py for each subject within the specified directory. The default name for the output classification file is fix4melview_Standard_thr20.txt.
+Feeds paths, multipliers, and output file names to check_slices.py for each
+subject within the specified directory. The default name for the output
+classification file is fix4melview_Standard_thr20.txt.
 ```
 
 ### s3_identify_components.py
 
 ```
 Usage:
-  s3_remove_flagged_components.py <directory> <clean_img> -o output
+  s3_remove_flagged_components.py -c PATH -o PATH <directory>
 
 Arguments:
-<directory>    path to run location
-                    (i.e. location where subject folders and MELODIC output are contained; same as s1 and s2)
-
-<cleaned>      path to desired location of cleaned, separated scans
+  <directory>         Path to top experiment directory.
 
 Options:
-    --output PATH       if csv outputs were generated in non-default location, identify path to this location
+  --clean_img, -c     Path to desired location of cleaned images.
 
-    --date, -d DATE     if processing data with a collection date straddling the scanner upgrade date, use the -d option to specify
-                        Correct options are either "-d before" or "-d after". After is the default. Choosing "before" will not remove
-                        any components, but will rename and place a copy of the preprocessed, but uncleaned spiral in the cleaned images path.
+  --output, -o        If csv outputs were generated in non-default location,
+                      identify path to this location.
+
 DETAILS
-Uses fsl_regfilt to regress out the components specified in the last line of the classification file (fix4melview_Standard_thr20.txt).
-The outputs are cleaned, but separated spiral niftis named subject.sprl.denoised.nii.gz, within the <cleaned> directory.
+Uses fsl_regfilt to regress out the components specified in the last line of the
+classification file (fix4melview_Standard_thr20.txt). The outputs are cleaned,
+but still separated spiral niftis. They will be named subject.sprl.denoised.nii.gz.
 ```
 
 ### check_slices.py
 
 ```
 Usage:
-  check_slices.py <melodic_file> <outputname>
+  check_slices.py <melodic_file> <outputname> <factorA> <factorB>
 
 Arguments:
-<melodic_file>   path to any melodic_IC.nii.gz file
-<outputname>     path to desired output classification file location
-<factorA>        multiplier to be used to determine mid/high frequency cutoffs. If called from s2, default is 3.
-<factorB>        multiplier to be used to determine low frequency cutoffs. If called from s2, default is 1.
+  <melodic_file>      Path to any melodic_IC.nii.gz file.
+
+  <outputname>        Path to desired output classification file location.
+
+  <factorA>           Multiplier to be used to determine mid/high frequency
+                      cutoffs. If called from s2, default is 3.
+
+  <factorB>           Multiplier to be used to determine low frequency cutoffs.
+                      If called from s2, default is 1.
 
 DETAILS
-This script is called by s2_identify_components.py. Can be used independently to troubleshoot classification or path identification issues, or just to run one spiral scan at a time.
-The algorithm scores each slice based on how much high and low frequency information is present after performing an FFT (fast fourier transform). The scores are tallied per component,
-and the result deterimines whether or not a component is to be flagged for removal. The output of this script is a classification text file (fix4melview_Standard_thr20.txt), which details
-the score and classification criteria per slice, as well as the removal decision per component. The final line of this document is a list of which components are to be removed. If you disagree
-with the decision, change the component numbers in this list, as this line will be read into s3_remove_flagged_components.py.
+This script is called by s2_identify_components.py. Can be used independently to
+troubleshoot classification or path identification issues, or just to run one
+spiral scan at a time. The algorithm scores each slice based on how much high
+and low frequency information is present after performing an FFT (fast fourier
+transform). The scores are tallied per component, and the result determines
+whether or not a component is to be flagged for removal. The output of this script
+is a classification text file (fix4melview_Standard_thr20.txt), which details the
+score and classification criteria per slice, as well as the removal decision
+per component. The final line of this document is a list of which components are
+to be removed. If you disagree with the decision, change the component numbers in
+this list, as this line will be read into s3_remove_flagged_components.py.
 
 ```
 ### Usage Examples:
@@ -122,21 +146,21 @@ To run FeenICS locally for an experiment called EXPR, with additional use of Eri
 
 #### Step 1:
 ~~~sh
-s1_folder_setup.py /path/to/directory /path/to/subjectnames /path/to/spiralfiles
+s1_folder_setup.py /path/to/EXPR
 ~~~
 
 #### Step 2:
 ~~~sh
-s2_identify_components.py /path/to/directory
+s2_identify_components.py /path/to/EXPR
 ~~~
 
 #### Step 3(optional) - Run ICArus (see https://github.com/edickie/ICArus for install information):
 ~~~sh
-MELODIC_OUTPUTS=`cd /path/to/directory; ls -1d */sprl*`
+MELODIC_OUTPUTS=`cd /path/to/EXPR; ls -1d */sprl*`
 icarus-report ${MELODIC_OUTPUTS}
 ~~~
 
 #### Step 4 - After you are okay with classifications, run s3_1_remove_flagged_components.py:
 ~~~sh
-s3_remove_flagged_components.py /path/to/directory /path/to/desiredOutputFolder
+s3_remove_flagged_components.py /path/to/EXPR
 ~~~
