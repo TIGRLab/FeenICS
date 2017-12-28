@@ -40,7 +40,7 @@ Python dependancies (these will be installed when you install FeenICS if you don
 
 ```
 Usage:
-  s1_setup.py -p -i PATH -s PATH <directory>
+  s1_folder_setup.py -p -i PATH -s PATH <directory>
 
 Arguments:
 
@@ -68,7 +68,7 @@ print instructions to run MCFLIRT, BET, and MELODIC using GNU parallel.
 
 ```
 Usage:
-  s2_1_RemoveNoise.py -m FLOAT -l FLOAT <directory>
+  s2_identify_components.py -m FLOAT -l FLOAT <directory>
 
 Arguments:
   <directory>         Path to top experiment directory.
@@ -88,7 +88,7 @@ subject within the specified directory. The default name for the output
 classification file is fix4melview_Standard_thr20.txt.
 ```
 
-### s3_identify_components.py
+### s3_remove_flagged_components.py
 
 ```
 Usage:
