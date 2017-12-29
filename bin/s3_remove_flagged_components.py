@@ -38,7 +38,7 @@ def regfilt(csv, clean_img, directory, i, sprl):
         with open(csv) as file:
             slices = file.readlines()[-1]
     except Exception:
-        print("Could not find file containing components to be removed")
+        print("fix4melview_Standard_thr20.txt not found. Have you run s2_identify_components.py?")
         return
 
 # Remove brackets
@@ -53,7 +53,12 @@ def regfilt(csv, clean_img, directory, i, sprl):
 # move into the subject's Prestats folder
     os.chdir(os.path.join(directory, i, sprl))
 # create file path for output image
-    clean_img =  os.path.join(clean_img, '.'.join(filename))
+
+    if (clean_img != directory):
+        clean_img = directory + clean_img + '/' + '.'.join(filename)
+    else:
+        clean_img = os.path.join(clean_img, '.'.join(filename))
+
     if (slices2remove != '""'):
         # call fsl_regfilt to perform the component regression
         call(["fsl_regfilt", "-i", "filtered_func_data", "-o", clean_img, "-d", "filtered_func_data.ica/melodic_mix", "-f", slices2remove])
@@ -64,23 +69,24 @@ def regfilt(csv, clean_img, directory, i, sprl):
 def main(directory, clean_img, output):
 
     list = os.listdir(directory)
+
     for i in list:
-# name of file containing list of components to remove
-        csvfilenameSPRLIN = 'fix4melview_Standard_thr20.txt'
-        csvfilenameSPRLOUT = 'fix4melview_Standard_thr20.txt'
+        if os.path.isdir(os.path.join(directory, i, 'sprlIN')) == True:
+            # name of file containing list of components to remove
+            csvfilenameSPRLIN = 'fix4melview_Standard_thr20.txt'
+            csvfilenameSPRLOUT = 'fix4melview_Standard_thr20.txt'
 
-# file path to list of components to remove
-        if output is not directory:
-            outputcsvSPRLIN = os.path.join(output, csvfilenameSPRLIN)
-            outputcsvSPRLOUT = os.path.join(output, csvfilenameSPRLOUT)
-        else:
-            outputcsvSPRLIN = os.path.join(directory, i, 'sprlIN', csvfilenameSPRLIN)
-            outputcsvSPRLOUT = os.path.join(directory, i, 'sprlOUT', csvfilenameSPRLOUT)
+        # file path to list of components to remove
+            if output is not directory:
+                outputcsvSPRLIN = os.path.join(output, csvfilenameSPRLIN)
+                outputcsvSPRLOUT = os.path.join(output, csvfilenameSPRLOUT)
+            else:
+                outputcsvSPRLIN = os.path.join(directory, i, 'sprlIN', csvfilenameSPRLIN)
+                outputcsvSPRLOUT = os.path.join(directory, i, 'sprlOUT', csvfilenameSPRLOUT)
 
-# call regfilt function to regress out components
-        regfilt(outputcsvSPRLIN, clean_img, directory, i, "sprlIN")
-        regfilt(outputcsvSPRLOUT, clean_img, directory, i, "sprlOUT")
-
+            # call regfilt function to regress out components
+            regfilt(outputcsvSPRLIN, clean_img, directory, i, "sprlIN")
+            regfilt(outputcsvSPRLOUT, clean_img, directory, i, "sprlOUT")
 
 if __name__ == '__main__':
 
