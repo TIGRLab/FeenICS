@@ -30,8 +30,8 @@ Python dependancies (these will be installed when you install FeenICS if you don
  + scikit-image (>=0.13.1)
 
 ## There are four executables:
-+ [**s1_folder_setup.py**](#s1_1_folder_setup.py) : To create the folder structure necessary to run Melodic and the remainder of the scripts.
-+ [**s2_identify_components.py**](#s2_1_identify_components.py) : To run check_slices.py for an entire folder of subjects and outputs a classification text file (default: fix4melview_Standard_thr20.txt).
++ [**s1_folder_setup.py**](#s1_folder_setup.py) : To create the folder structure necessary to run Melodic and the remainder of the scripts.
++ [**s2_identify_components.py**](#s2_identify_components.py) : To run check_slices.py for an entire folder of subjects and outputs a classification text file (default: fix4melview_Standard_thr20.txt).
 + [**s3_remove_flagged_components.py**](#s3_remove_flagged_components.py) : To remove flagged components once content with the results of the classifcation. This script reads the final line of the classification text file.
 + [**check_slices.py**](#check_slices.py) : To classify components as keep or remove. Is run by s2_identify_components.py, but can be run by itself on an individual scan.
 
@@ -109,6 +109,16 @@ classification file (fix4melview_Standard_thr20.txt). The outputs are cleaned,
 but still separated spiral niftis. They will be named subject.sprl.denoised.nii.gz.
 ```
 
+### icarus-report (optional)
+
+```
+An html report creation tool written by [E.Dickie](https://github.com/edickie).
+This step is optional, but will make checking your data much easier.
+
+Follow the sample in **Usage Examples**, below or click [here](https://github.com/edickie/ICArus)
+for futher instructions.
+```
+
 ### check_slices.py
 
 ```
@@ -154,10 +164,10 @@ s1_folder_setup.py /path/to/EXPR
 s2_identify_components.py /path/to/EXPR
 ~~~
 
-#### Step 3(optional) - Run ICArus (see https://github.com/edickie/ICArus for install information):
+#### Step 3(optional) - Run ICArus (see https://github.com/edickie/ICArus for more information):
 ~~~sh
-MELODIC_OUTPUTS=`cd /path/to/EXPR; ls -1d */sprl*`
-icarus-report ${MELODIC_OUTPUTS}
+sprls=`cd /path/to/EXPR; ls -1d */sprl*`
+icarus-report ${sprls}
 ~~~
 
 #### Step 4 - After you are okay with classifications, run s3_1_remove_flagged_components.py:

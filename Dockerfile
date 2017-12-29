@@ -22,7 +22,6 @@ RUN pip install -U "numpy"
 RUN pip install -U "scipy"
 RUN pip install -U "scikit-image==0.13.1"
 RUN pip install -U "docopt"
-RUN pip install -U "glob"
 RUN pip install -U "pandas"
 
 RUN mkdir FeenICS
