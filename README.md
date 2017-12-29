@@ -167,6 +167,8 @@ s2_identify_components.py /path/to/EXPR
 ~~~sh
 sprls=`cd /path/to/EXPR; ls -1d */sprl*`
 icarus-report ${sprls}
+
+Open qc_icafix.html in your favourite web browser to view the classification results.
 ~~~
 
 #### Step 4 - After you are okay with classifications, run s3_1_remove_flagged_components.py:
