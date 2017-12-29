@@ -111,13 +111,12 @@ but still separated spiral niftis. They will be named subject.sprl.denoised.nii.
 
 ### icarus-report (optional)
 
-```
 An html report creation tool written by [E.Dickie](https://github.com/edickie).
 This step is optional, but will make checking your data much easier.
 
 Follow the sample in **Usage Examples**, below or click [here](https://github.com/edickie/ICArus)
 for futher instructions.
-```
+
 
 ### check_slices.py
 
