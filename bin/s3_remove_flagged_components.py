@@ -54,8 +54,9 @@ def regfilt(csv, clean_img, directory, i, sprl):
     os.chdir(os.path.join(directory, i, sprl))
 # create file path for output image
 
-    if (clean_img != directory):
-        clean_img = directory + clean_img + '/' + '.'.join(filename)
+    if not os.path.exists(clean_img):
+        print("Destination path for clean image doesnt exist: {}. Cannot proceed".format(clean_img))
+        sys.exit(1)
     else:
         clean_img = os.path.join(clean_img, '.'.join(filename))
 
