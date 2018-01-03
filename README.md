@@ -165,7 +165,7 @@ s2_identify_components.py /path/to/EXPR
 
 #### Step 3(optional) - Run ICArus (see https://github.com/edickie/ICArus for more information):
 ~~~sh
-sprls=`cd /path/to/EXPR; ls -1d */sprl*`
+sprls=`cd /path/to/EXPR; ls -1d */sprl*/`
 icarus-report ${sprls}
 
 Open qc_icafix.html in your favourite web browser to view the classification results.
