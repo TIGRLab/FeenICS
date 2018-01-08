@@ -1,0 +1,56 @@
+#! /bin/csh -f
+
+# no input required (will find *sprlIN* and *sprlOUT* pairs)
+# run this script in the directory that has *sprlIN* and sprlOUT* pairs of nifti files, cleaned and ready to be recombined
+# will use a temporal-AVE-based SNR to weigh the IN and OUT contributions: w1=aveIN/(aveIN+OUT), w2=1-w1
+# sprlcombined=(w1*sprlIN)+(w2*sprlOUT)
+
+set dirpath=`pwd`
+
+set outFILES=`find . -type f -name '*sprlOUT*' `   
+#echo $outFILES
+foreach outFILE ($outFILES)
+	#echo $outFILE
+	set inFILE=`echo $outFILE | sed s/sprlOUT/sprlIN/g`
+	echo "combining $outFILE and $inFILE ... "
+
+	set basenameOUT=`echo $outFILE | sed s/.nii.gz//g`
+	set basenameIN=`echo $inFILE | sed s/.nii.gz//g`
+
+	set aveIN=`echo $basenameIN | sed s/IN/tempAVEIN/g`
+	#echo $aveIN
+	fslmaths $inFILE -Tmean $aveIN
+
+	set aveOUT=`echo $basenameOUT | sed s/OUT/tempAVEOUT/g`
+	#echo $aveOUT
+	fslmaths $outFILE -Tmean $aveOUT
+
+	set aveINOUT=`echo $basenameIN | sed s/IN/tempAVEINplusOUT/g`
+	fslmaths $aveIN -add $aveOUT $aveINOUT
+
+	set wIN=`echo $basenameIN | sed s/IN/weightIN/g`
+	fslmaths $aveIN -div $aveINOUT $wIN
+	set wOUT=`echo $basenameOUT | sed s/OUT/weightOUT/g`
+	fslmaths $aveOUT -div $aveINOUT $wOUT
+	set testsumw=`echo $basenameIN | sed s/IN/SUMweightsINOUT/g`
+	fslmaths $wIN -add $wOUT $testsumw
+	set meansumw=` fslstats $testsumw -M`
+	
+	if($meansumw =~ 1.0) then
+		echo "there is an error! sum of weights not equal 1"
+		exit
+	else
+		echo "good weights..."
+	endif 
+	
+	set sprlcomb=`echo $basenameIN | sed s/IN/COMBINED/g`
+	fslmaths $wIN -mul $inFILE tempWeightedIN
+	fslmaths $wOUT -mul $outFILE tempWeightedOUT
+	fslmaths tempWeightedIN -add tempWeightedOUT $sprlcomb
+	rm tempWeighted*
+	echo "made $sprlcomb"
+	
+
+	
+end
+	
