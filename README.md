@@ -23,11 +23,14 @@ This program requires either FSL or the outputs of FSL Melodic in order to work.
  + **FSL Melodic** http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/MELODIC
 
 Python dependancies (these will be installed when you install FeenICS if you don't already have them):
+ + docopt
  + nibabel
  + numpy
  + matplotlib
+ + pandas
  + scipy
  + scikit-image (>=0.13.1)
+
 
 ## There are four executables:
 + [**s1_folder_setup.py**](#s1_folder_setup.py) : To create the folder structure necessary to run Melodic and the remainder of the scripts.
