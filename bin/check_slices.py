@@ -98,7 +98,7 @@ def main(input_comps, output_csv, factorA, factorB, plot=False):
                 plt.show()
 
             # use masks to isolate lo and mid frequency areas of fft representation
-            mid_pxx = pxx[mid_mask ^ lo_mask]
+            mid_pxx = pxx[mid_mask - lo_mask]
             lo_pxx = pxx[lo_mask]
 
             # append sorted slices into a list
@@ -135,7 +135,7 @@ def main(input_comps, output_csv, factorA, factorB, plot=False):
 
             # use masks to isolate lo and mid frequency areas of fft representation
             pxx = abs(fftshift(fft2(data[:,:,zslice, comp]))**2)
-            mid_pxx = pxx[mid_mask ^ lo_mask]
+            mid_pxx = pxx[mid_mask - lo_mask]
             lo_pxx = pxx[lo_mask]
 
             count_mid = np.asarray(np.where(mid_pxx > cutoff_mid_list[zslice]))
