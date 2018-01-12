@@ -14,15 +14,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get autoremove \
     && apt-get clean
 
-RUN pip install -U "setuptools"
-RUN pip install -U "pip"
-RUN pip install -U "matplotlib"
-RUN pip install -U "nibabel"
-RUN pip install -U "numpy"
-RUN pip install -U "scipy"
-RUN pip install -U "scikit-image==0.13.1"
-RUN pip install -U "docopt"
-RUN pip install -U "pandas"
+RUN pip install -U "setuptools" "pip"
+RUN pip install -U "matplotlib==2.1.1" "nibabel==2.2.1" "numpy==1.13.3" "scipy==1.0.0" "scikit-image==0.13.1" \
+    "docopt==0.6.2" "pandas==0.22.0"
 
 RUN wget http://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py \
     && python fslinstaller.py -E -V 5.0.10 -d /usr/local/fsl \
